@@ -55,7 +55,7 @@ function createCover(course, teacher, student, font){
   finalImage.setWidth(300);
   finalImage.setHeight(300);
 
-  body.appendParagraph(""); //To fill work's Name
+  body.appendParagraph(""); //To fill works Name
   cursor.insertText(course);
   textInserted.setFontFamily(font).setFontSize(16);
   cursor.insertText("Docente: ${teacher}").setFontFamily(font).setFontSize(16).setBold(true).setAlignment(DocumentApp.HorizontalAlignment.CENTER);
