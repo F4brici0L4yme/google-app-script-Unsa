@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <label for='course'>Curso:</label>
+
+      <select id="course">
+        //To fill
+      </select>
+    <br><br>
+    <label for='teacher'>Profesor:</label><br>
+    <select id="teacher">
+    </select>
+
+    <br><br>
+    <label for="student">Estudiante:</label><br>
+    <select id="student">
+        //To fill
+    </select>
+    <br>
+    <br>
+    <label for="font">Fuente:</label><br>
+    <select id="font">
+      <option value="Arial">Arial</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+      <button onclick='insert()'>Crear carátula</button>
+
+<script>
+  window.onload = function () {
+    google.script.run.withSuccessHandler(function(data) {
+      const teachers = data.teacherNames;
+      const courses = data.courseNames;
+      const students = data.studentNames;
+
+      const teacherSelect = document.getElementById('teacher');
+      const courseSelect = document.getElementById('course');
+      const studentSelect = document.getElementById('student');
+
+      function fillSelect(selectElement, items) {
+        selectElement.innerHTML = "";
+        items.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          option.textContent = item;
+          selectElement.appendChild(option);
+        });
+      }
+
+      fillSelect(courseSelect, courses);
+      fillSelect(teacherSelect, teachers);
+      fillSelect(studentSelect, students);
+
+    }).getData();
+  };
+
+  function insert() {
+    const course = document.getElementById('course').value;
+    const teacher = document.getElementById('teacher').value;
+    const student = document.getElementById('student').value;
+    const font = document.getElementById('font').value;
+
+    google.script.run.createCover(course, teacher, student, font);
+  }
+</script>
+
+  </body>
+</html>
