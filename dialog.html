@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <label for='phrase'>Choose a text to insert</label>
+    <br>
+    <br>
+      <select id="phrase">
+      <option value="Saludos cordiales.">Saludos cordiales.</option>
+      <option value="Gracias por su atención.">Gracias por su atención.</option>
+      <option value="Quedo atento(a) a sus comentarios.">Quedo atento(a) a sus comentarios.</option>
+    </select>
+    <br>
+    <br>
+
+    <label for="font">Fuente:</label><br>
+    <select id="font">
+      <option value="Arial">Arial</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+
+    <br><br>
+    <label for="size">Tamaño de letra:</label><br>
+    <select id="size">
+      <option value="10">10</option>
+      <option value="12" selected>12</option>
+      <option value="14">14</option>
+      <option value="16">16</option>
+    </select>
+    <br>
+    <br>
+      <button onclick='insert()'>Insert</button>
+
+
+
+    <script>
+      function insert(){
+        const text = document.getElementById('phrase').value;
+        const font = document.getElementById('font').value;
+        const size = document.getElementById('size').value;
+                google.script.run.withSuccessHandler(() => {
+          google.script.host.close();
+        }).insertText(text, font, size);
+      }
+    </script>
+  </body>
+</html>
