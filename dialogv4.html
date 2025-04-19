@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        padding: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        background-color: #6200ea;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #3700b3;
+      }
+
+      h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Personalización de Carátula</h3>
+
+    <label for='course'>Curso:</label>
+    <select id="course">
+      <!-- To fill dynamically -->
+    </select>
+    
+    <label for='teacher'>Profesor:</label>
+    <select id="teacher">
+      <!-- To fill dynamically -->
+    </select>
+
+    <label for="student">Estudiante:</label>
+    <select id="student">
+      <!-- To fill dynamically -->
+    </select>
+
+    <label for="font">Fuente:</label>
+    <select id="font">
+      <option value="Arial">Arial</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+
+    <br>
+    <button onclick='insert()'>Crear carátula</button>
+
+    <script>
+      window.onload = function () {
+        google.script.run.withSuccessHandler(function(data) {
+          const teachers = data.teacherNames;
+          const courses = data.courseNames;
+          const students = data.studentNames;
+
+          const teacherSelect = document.getElementById('teacher');
+          const courseSelect = document.getElementById('course');
+          const studentSelect = document.getElementById('student');
+
+          function fillSelect(selectElement, items) {
+            selectElement.innerHTML = "";
+            items.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item;
+              option.textContent = item;
+              selectElement.appendChild(option);
+            });
+          }
+
+          fillSelect(courseSelect, courses);
+          fillSelect(teacherSelect, teachers);
+          fillSelect(studentSelect, students);
+
+        }).getData();
+      };
+
+      function insert() {
+        const course = document.getElementById('course').value;
+        const teacher = document.getElementById('teacher').value;
+        const student = document.getElementById('student').value;
+        const font = document.getElementById('font').value;
+
+        google.script.run.createCover(course, teacher, student, font);
+
+        // Close dialog after generating the cover
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
