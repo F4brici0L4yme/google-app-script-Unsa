@@ -7,52 +7,55 @@
     <style>
       body { margin: 0; padding: 0; font-family: Roboto, Arial, sans-serif; background: #fff; }
       .dialog-container {
-        width: 100%;
-        max-width: 400px;
-        margin: 40px auto;
-        padding: 20px;
-        border: 1px solid #dadce0;
-        border-radius: 8px;
-        box-shadow: none;
+        width: 100%; max-width: 400px;
+        margin: 40px auto; padding: 20px;
+        border: 1px solid #dadce0; border-radius: 8px;
         background-color: #fff;
-      }
-      h3 {
-        margin-top: 0;
-        font-size: 20px;
-        color: #202124;
-        text-align: center;
       }
       label {
         display: block;
         margin: 12px 0 4px;
         font-size: 14px;
-        color: #3c4043;
       }
-      select {
+      .dropdown {
+        position: relative;
+      }
+      .dropdown input {
         width: 100%;
         padding: 8px 12px;
         font-size: 14px;
-        color: #202124;
         border: 1px solid #dadce0;
         border-radius: 4px;
-        appearance: none;
-        background-color: #fff;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="%233c4043" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 8px center;
-        background-size: 16px;
+      }
+      .list {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1;
+        display: none;
+      }
+      .list div {
+        padding: 6px;
         cursor: pointer;
       }
-      select:focus { outline: none; border-color: #4285f4; }
+      .list div:hover {
+        background: #eee;
+      }
+      select, button {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        margin-top: 4px;
+      }
       button {
         margin-top: 24px;
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        color: #fff;
         background-color: #1a73e8;
-        border: none;
-        border-radius: 4px;
+        color: white;
         cursor: pointer;
       }
       button:hover { background-color: #1669c1; }
@@ -61,14 +64,23 @@
   </head>
   <body>
     <div class="dialog-container">
-      <label for="course">Curso</label>
-      <select id="course"></select>
+      <label for="courseInput">Curso</label>
+      <div class="dropdown">
+        <input id="courseInput" oninput="filterList('course')" onfocus="showList('course')">
+        <div id="courseList" class="list"></div>
+      </div>
 
-      <label for="teacher">Profesor</label>
-      <select id="teacher"></select>
+      <label for="teacherInput">Profesor</label>
+      <div class="dropdown">
+        <input id="teacherInput" oninput="filterList('teacher')" onfocus="showList('teacher')">
+        <div id="teacherList" class="list"></div>
+      </div>
 
-      <label for="student">Estudiante</label>
-      <select id="student"></select>
+      <label for="studentInput">Estudiante</label>
+      <div class="dropdown">
+        <input id="studentInput" oninput="filterList('student')" onfocus="showList('student')">
+        <div id="studentList" class="list"></div>
+      </div>
 
       <label for="font">Fuente</label>
       <select id="font">
@@ -80,32 +92,68 @@
     </div>
 
     <script>
+      const dataStore = {};
+
       window.onload = function () {
         google.script.run.withSuccessHandler(function(data) {
-          const { teacherNames, courseNames, studentNames } = data;
-          const fill = (id, items) => {
-            const sel = document.getElementById(id);
-            sel.innerHTML = '';
-            items.forEach(item => {
-              const opt = document.createElement('option');
-              opt.value = item;
-              opt.textContent = item;
-              sel.appendChild(opt);
-            });
-          };
-          fill('course', courseNames);
-          fill('teacher', teacherNames);
-          fill('student', studentNames);
+          dataStore.teacher = data.teacherNames;
+          dataStore.course = data.courseNames;
+          dataStore.student = data.studentNames;
+          ['teacher', 'course', 'student'].forEach(fillList);
         }).getData();
       };
+
+      function fillList(type) {
+        const list = document.getElementById(type + 'List');
+        list.innerHTML = '';
+        dataStore[type].forEach(name => {
+          const item = document.createElement('div');
+          item.textContent = name;
+          item.onclick = () => {
+            document.getElementById(type + 'Input').value = name;
+            list.style.display = 'none';
+          };
+          list.appendChild(item);
+        });
+      }
+
+      function filterList(type) {
+        const val = document.getElementById(type + 'Input').value.toLowerCase();
+        const list = document.getElementById(type + 'List');
+        list.innerHTML = '';
+        dataStore[type]
+          .filter(name => name.toLowerCase().includes(val))
+          .forEach(name => {
+            const item = document.createElement('div');
+            item.textContent = name;
+            item.onclick = () => {
+              document.getElementById(type + 'Input').value = name;
+              list.style.display = 'none';
+            };
+            list.appendChild(item);
+          });
+        list.style.display = list.childElementCount ? 'block' : 'none';
+      }
+
+      function showList(type) {
+        fillList(type);
+        document.getElementById(type + 'List').style.display = 'block';
+      }
+
       function insert() {
-        const course  = document.getElementById('course').value;
-        const teacher = document.getElementById('teacher').value;
-        const student = document.getElementById('student').value;
+        const course  = document.getElementById('courseInput').value;
+        const teacher = document.getElementById('teacherInput').value;
+        const student = document.getElementById('studentInput').value;
         const font    = document.getElementById('font').value;
         google.script.run.createCover(course, teacher, student, font);
         google.script.host.close();
       }
+
+      document.addEventListener('click', e => {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.list').forEach(list => list.style.display = 'none');
+        }
+      });
     </script>
   </body>
 </html>

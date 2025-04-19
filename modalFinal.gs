@@ -21,7 +21,7 @@ function getData() {
     .openById(SHEET_ID)
     .getSheetByName(SHEET_NAME);
 
-  const teacherNames = sheet.getRange('A12:A20').getValues().flat().filter(v => v !== '');
+  const teacherNames = sheet.getRange('A12:A').getValues().flat().filter(v => v !== '');
   const courseNames  = sheet.getRange('C2:C').getValues().flat().filter(v => v !== '');
   const studentNames = sheet.getRange('D2:D').getValues().flat().filter(v => v !== '');
 
