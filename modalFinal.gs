@@ -1,3 +1,6 @@
+const SHEET_ID   = '1uCE8KJoVQtJzpVaK22ewlwkRwX9WUVxVDS1Cfjh5ql0';
+const SHEET_NAME = 'Data';
+
 function onOpen() {
   DocumentApp.getUi()
     .createMenu('Carátula')
@@ -5,88 +8,76 @@ function onOpen() {
     .addToUi();
 }
 
-function showModal(){
+function showModal() {
   const html = HtmlService
     .createHtmlOutputFromFile('dialogFinal')
     .setWidth(450)
-    .setHeight(530);
+    .setHeight(450);
   DocumentApp.getUi().showModalDialog(html, 'Personalización de carátula');
 }
 
 function getData() {
-  const ss = SpreadsheetApp.openById('1uCE8KJoVQtJzpVaK22ewlwkRwX9WUVxVDS1Cfjh5ql0');
-  const sheet = ss.getSheetByName('Data');
+  const sheet = SpreadsheetApp
+    .openById(SHEET_ID)
+    .getSheetByName(SHEET_NAME);
+
+  const teacherNames = sheet.getRange('A12:A20').getValues().flat().filter(v => v !== '');
+  const courseNames  = sheet.getRange('C2:C').getValues().flat().filter(v => v !== '');
+  const studentNames = sheet.getRange('D2:D').getValues().flat().filter(v => v !== '');
+
   return {
-    teacherNames: sheet.getRange('A12:A20').getValues().flat().filter(v => v !== ''),
-    courseNames:  sheet.getRange('C2:C9').getValues().flat().filter(v => v !== ''),
-    studentNames: sheet.getRange('D2:D93').getValues().flat().filter(v => v !== '')
+    teacherNames,
+    courseNames,
+    studentNames
   };
 }
 
-function createCover(course, teacher, student, font){
-  const doc = DocumentApp.getActiveDocument();
-  const body = doc.getBody();
-  //Header
-  body.appendParagraph('UNIVERSIDAD NACIONAL DE SAN AGUSTÍN')
-    .setFontFamily(font).setFontSize(21).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
-  body.appendParagraph('FACULTAD DE INGENIERÍA DE PROCESOS Y SERVICIOS')
-    .setFontFamily(font).setFontSize(16).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
-  body.appendParagraph('').setFontSize(16);
+function createCover(course, teacher, student, font) {
+  const body  = DocumentApp.getActiveDocument().getBody();
+  body.clear();
+  const align = DocumentApp.HorizontalAlignment.CENTER;
+  const black = '#000000';
+  const gray  = '#d9d9d9';
 
-  body.appendParagraph('ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS')
-    .setFontFamily(font).setFontSize(16).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
+  const append = (text, size, bold, color = black) =>
+    body.appendParagraph(text)
+        .setFontFamily(font)
+        .setFontSize(size)
+        .setBold(bold)
+        .setForegroundColor(color)
+        .setAlignment(align);
 
-  body.appendParagraph('').setFontSize(16);
-  //Image
-  const urlImage = 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Escudo_UNSA.png';
-  const blob = UrlFetchApp.fetch(urlImage).getBlob();
+  const blank = size =>
+    body.appendParagraph('').setFontSize(size);
+
+  append('UNIVERSIDAD NACIONAL DE SAN AGUSTÍN',               21, true);
+  append('FACULTAD DE INGENIERÍA DE PROCESOS Y SERVICIOS',    16, true);
+  blank(16);
+  append('ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS',    16, true);
+  blank(16);
+
+  const logoBlob = UrlFetchApp
+    .fetch('https://upload.wikimedia.org/wikipedia/commons/f/f9/Escudo_UNSA.png')
+    .getBlob();
   body.appendParagraph('')
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .appendInlineImage(blob)
-    .setWidth(4.24 * 72)
-    .setHeight(5.30 * 72);
-  //Middle Text
-    body.appendParagraph('').setFontSize(16);
-    body.appendParagraph('<Nombre de Actividad>')
-    .setFontFamily(font).setFontSize(21).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
-  body.appendParagraph('').setFontSize(16);
+      .setAlignment(align)
+      .appendInlineImage(logoBlob)
+      .setWidth(4.24 * 72)
+      .setHeight(5.30 * 72);
 
-  body.appendParagraph(course)
-    .setFontFamily(font).setFontSize(16)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
+  blank(16);
+  append('<Nombre de Actividad>', 21, true);
+  blank(16);
+  append(course,               16, true);
+  blank(16);
+  append(`Docente: ${teacher}`, 16, true);
+  blank(16);
+  append(`Alumno: ${student}`,  16, true);
 
-  body.appendParagraph('').setFontSize(16);
+  for (let i = 0; i < 5; i++) blank(14);
 
-  body.appendParagraph(`Docente: ${teacher}`)
-    .setFontFamily(font).setFontSize(16).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
+  append('Arequipa - 2025', 16, true, gray);
 
-  body.appendParagraph('').setFontSize(16);
-
-  body.appendParagraph(`Alumno: ${student}`)
-    .setFontFamily(font).setFontSize(16).setBold(true)
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-    .setForegroundColor('#000000');
-
-  body.appendParagraph('').setFontSize(14);
-  body.appendParagraph('').setFontSize(14);
-  body.appendParagraph('').setFontSize(14);
-  body.appendParagraph('').setFontSize(14);
-  //Footer
-  body.appendParagraph('Arequipa - 2025')
-    .setFontFamily(font).setFontSize(16).setBold(true)
-    .setForegroundColor('#d9d9d9')
-    .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
   body.removeChild(body.getChild(0));
-
+  body.appendParagraph('').setFontSize(11).setForegroundColor('#000000').setBold(false);
 }
