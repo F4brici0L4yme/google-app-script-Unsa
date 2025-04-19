@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <style>
+      body { margin: 0; padding: 0; font-family: Roboto, Arial, sans-serif; background: #fff; }
+      .dialog-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 20px;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        box-shadow: none;
+        background-color: #fff;
+      }
+      h3 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #202124;
+        text-align: center;
+      }
+      label {
+        display: block;
+        margin: 12px 0 4px;
+        font-size: 14px;
+        color: #3c4043;
+      }
+      select {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        color: #202124;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        appearance: none;
+        background-color: #fff;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%233c4043" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        cursor: pointer;
+      }
+      select:focus { outline: none; border-color: #4285f4; }
+      button {
+        margin-top: 24px;
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        color: #fff;
+        background-color: #1a73e8;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover { background-color: #1669c1; }
+      button:active { background-color: #1558a0; }
+    </style>
+  </head>
+  <body>
+    <div class="dialog-container">
+      <h3>Personalización de Carátula</h3>
+
+      <label for="course">Curso</label>
+      <select id="course"></select>
+
+      <label for="teacher">Profesor</label>
+      <select id="teacher"></select>
+
+      <label for="student">Estudiante</label>
+      <select id="student"></select>
+
+      <label for="font">Fuente</label>
+      <select id="font">
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+      </select>
+
+      <button onclick="insert()">Crear carátula</button>
+    </div>
+
+    <script>
+      window.onload = function () {
+        google.script.run.withSuccessHandler(function(data) {
+          const { teacherNames, courseNames, studentNames } = data;
+          const fill = (id, items) => {
+            const sel = document.getElementById(id);
+            sel.innerHTML = '';
+            items.forEach(item => {
+              const opt = document.createElement('option');
+              opt.value = item;
+              opt.textContent = item;
+              sel.appendChild(opt);
+            });
+          };
+          fill('course', courseNames);
+          fill('teacher', teacherNames);
+          fill('student', studentNames);
+        }).getData();
+      };
+      function insert() {
+        const course  = document.getElementById('course').value;
+        const teacher = document.getElementById('teacher').value;
+        const student = document.getElementById('student').value;
+        const font    = document.getElementById('font').value;
+        google.script.run.createCover(course, teacher, student, font);
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
