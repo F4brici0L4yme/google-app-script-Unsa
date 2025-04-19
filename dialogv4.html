@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base target="_top">
     <style>
+      /* Google Fonts */
       @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+      /* General Body Style */
       body {
         font-family: 'Roboto', sans-serif;
         background-color: #f7f7f7;
@@ -49,6 +51,7 @@
         color: #333;
       }
 
+      /* Modern Style for Select Elements */
       select {
         width: 100%;
         padding: 14px;
@@ -64,11 +67,13 @@
         box-sizing: border-box;
       }
 
+      /* Focus Effect */
       select:focus {
         border: 1px solid #6200ea;
         background-color: #fff;
       }
 
+      /* Dropdown Option Styling */
       option {
         font-size: 16px;
         padding: 10px;
@@ -102,10 +107,12 @@
         outline: none;
       }
 
+      /* Focused Button */
       button:active {
         transform: translateY(1px);
       }
 
+      /* Small Screen Adjustments */
       @media (max-width: 480px) {
         .dialog-container {
           padding: 15px;
@@ -120,17 +127,17 @@
 
       <label for='course'>Curso:</label>
       <select id="course">
-
+        <!-- Dynamically filled -->
       </select>
       
       <label for='teacher'>Profesor:</label>
       <select id="teacher">
-
+        <!-- Dynamically filled -->
       </select>
 
       <label for="student">Estudiante:</label>
       <select id="student">
-
+        <!-- Dynamically filled -->
       </select>
 
       <label for="font">Fuente:</label>
@@ -139,6 +146,7 @@
         <option value="Times New Roman">Times New Roman</option>
       </select>
 
+      <!-- Centered button -->
       <button onclick='insert()'>Crear carátula</button>
     </div>
 
@@ -176,7 +184,10 @@
         const student = document.getElementById('student').value;
         const font = document.getElementById('font').value;
 
+        // Run the createCover function to generate the cover
         google.script.run.createCover(course, teacher, student, font);
+
+        // Close dialog after creating the cover
         google.script.host.close();
       }
     </script>
