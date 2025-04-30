@@ -57,31 +57,6 @@ function createCover(course, teacher, students, font) {
         .setAlignment(align);
   }
 
-  // Formatea cada celda de una tabla
-  function formatTable(table, size) {
-    const rows = table.getNumRows();
-    for (let r = 0; r < rows; r++) {
-      const row = table.getRow(r);
-      const cells = row.getNumCells();
-      for (let c = 0; c < cells; c++) {
-        const cell = row.getCell(c);
-        // Recorre todos los párrafos dentro de la celda
-        for (let i = 0; i < cell.getNumChildren(); i++) {
-          const child = cell.getChild(i);
-          if (child.getType() === DocumentApp.ElementType.PARAGRAPH) {
-            const p = child.asParagraph();
-            p.setFontFamily(font)
-             .setFontSize(size)
-             .setBold(false)
-             .setForegroundColor(black)
-             .setAlignment(align);
-          }
-        }
-        cell.setBorderWidth(0);
-      }
-    }
-  }
-
   // ----- Inicia creación de carátula -----
   append('UNIVERSIDAD NACIONAL DE SAN AGUSTÍN',               21, true);
   append('FACULTAD DE INGENIERÍA DE PROCESOS Y SERVICIOS',    16, true);
@@ -129,24 +104,26 @@ function createCover(course, teacher, students, font) {
     logoParagraph.setWidth(3.45 * 72).setHeight(4.13 * 72);
   }
   else {
-    append('Integrantes:', 16, true);
+    append('Integrantes:', 15, true);
+    body.appendParagraph('').setBold(false).setAlignment(align);
 
     // Prepara filas de dos columnas
     const tableData = [];
     for (let i = 0; i < students.length; i += 2) {
       tableData.push([ students[i], students[i+1] || '' ]);
     }
-
     const table = body.appendTable(tableData);
     table.setBorderWidth(0);
 
     // Formatea toda la tabla a tamaño 16 y alineado
-    formatTable(table, 16);
-    body.removeChild(body.getChild(0));
+    logoParagraph.setWidth(3.45 * 72).setHeight(4.17 * 72);
+
   }
 
+
+
   // Pie de página
-  for (let i = 0; i < 3; i++) blank(14);
+  for (let i = 0; i < 2; i++) blank(14);
   append('Arequipa - 2025', 16, true, gray);
 
   // Limpieza de primer párrafo vacío
