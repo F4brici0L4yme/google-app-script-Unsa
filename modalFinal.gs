@@ -4,23 +4,15 @@ const SHEET_NAME = 'Data';
 function onOpen() {
   DocumentApp.getUi()
     .createMenu('Carátula')
-    .addItem('Trabajo individual', 'showSoloModal')
-    .addItem('Trabajo grupal', 'showGroupModal')
+    .addItem('Generar', 'showModal')
     .addToUi();
 }
 
-function showSoloModal() {
-  const html = HtmlService.createHtmlOutputFromFile('dialogSolo')
-    .setWidth(500)
-    .setHeight(500);
-  DocumentApp.getUi().showModalDialog(html, 'Carátula - Trabajo individual');
-}
-
-function showGroupModal() {
-  const html = HtmlService.createHtmlOutputFromFile('dialogGroup')
+function showModal() {
+  const html = HtmlService.createHtmlOutputFromFile('dialogFinal')
     .setWidth(500)
     .setHeight(600);
-  DocumentApp.getUi().showModalDialog(html, 'Carátula - Trabajo grupal');
+  DocumentApp.getUi().showModalDialog(html, 'Personalización de Carátula');
 }
 
 function getData() {
@@ -39,9 +31,10 @@ function getData() {
   };
 }
 
-function createCover(course, teacher, student, font) {
+function createCover(course, teacher, students, font) {
   const body  = DocumentApp.getActiveDocument().getBody();
   body.clear();
+
   const align = DocumentApp.HorizontalAlignment.CENTER;
   const black = '#000000';
   const gray  = '#d9d9d9';
@@ -60,7 +53,7 @@ function createCover(course, teacher, student, font) {
   append('UNIVERSIDAD NACIONAL DE SAN AGUSTÍN',               21, true);
   append('FACULTAD DE INGENIERÍA DE PROCESOS Y SERVICIOS',    16, true);
   blank(16);
-  append('ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS',    16, true);
+  append('ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS',     16, true);
   blank(16);
 
   const logoBlob = UrlFetchApp
@@ -75,14 +68,44 @@ function createCover(course, teacher, student, font) {
   blank(16);
   append('<Nombre de Actividad>', 21, true);
   blank(16);
-  append(course,               16, true);
+  append(course, 16, true);
   blank(16);
   append(`Docente: ${teacher}`, 16, true);
   blank(16);
-  append(`Alumno: ${student}`,  16, true);
+
+  if (students.length === 1) {
+    append('Alumno:', 16, true);
+    append(students[0], 16, false);
+  } else if (students.length >= 2 && students.length <= 3) {
+    append('Integrantes:', 16, true);
+    students.forEach(s => append(s, 16, false));
+  } else {
+    body.removeChild(body.getChild(0));
+    append('Integrantes:', 16, true);
+    const tableData = [];
+    for (let i = 0; i < students.length; i += 2) {
+      const row = [
+        students[i],
+        students[i + 1] || '' // Si hay número impar
+      ];
+      tableData.push(row);
+    }
+    const table = body.appendTable(tableData);
+    table.setBorderWidth(0);
+    table.getRows().forEach(row => {
+      row.getCells().forEach(cell => {
+        const paragraph = cell.getChild(0).asParagraph();
+        paragraph.setFontSize(14);
+        paragraph.setFontFamily(font);
+        paragraph.setForegroundColor(black);
+        paragraph.setAlignment(align);
+        paragraph.setBold(false);
+        cell.setBorderWidth(0);
+      });
+    });
+  }
 
   for (let i = 0; i < 5; i++) blank(14);
-
   append('Arequipa - 2025', 16, true, gray);
 
   body.removeChild(body.getChild(0));

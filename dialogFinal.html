@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base target="_top">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base target="_top" />
     <style>
       html, body {
         margin: 0;
         padding: 0;
         font-family: Roboto, Arial, sans-serif;
         background: #fff;
-        overflow-x: hidden; /* Elimina scroll horizontal */
+        overflow-x: hidden;
         box-sizing: border-box;
       }
+      *, *::before, *::after {
+        box-sizing: inherit;
+      }
       .dialog-container {
-        width: 100%; max-width: 400px;
-        margin: 40px auto; padding: 20px;
-        border: 1px solid #dadce0; border-radius: 8px;
+        max-width: 460px;
+        margin: 40px auto;
+        padding: 20px;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
         background-color: #fff;
+        overflow: hidden;
       }
       label {
         display: block;
@@ -67,20 +73,14 @@
       }
       button:hover { background-color: #1669c1; }
       button:active { background-color: #1558a0; }
-
-      *, *::before, *::after {
-        box-sizing: inherit;
+      #selectedStudents span {
+        display: inline-block;
+        background: #e0e0e0;
+        margin: 3px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        cursor: pointer;
       }
-      .dialog-container {
-        width: 100%;
-        max-width: 460px; /* Antes: 400px */
-        margin: 40px auto;
-        padding: 20px;
-        border: 1px solid #dadce0;
-        border-radius: 8px;
-        background-color: #fff;
-        overflow: hidden;
-      } 
     </style>
   </head>
   <body>
@@ -97,14 +97,16 @@
         <div id="teacherList" class="list"></div>
       </div>
 
-      <label for="studentInput">Estudiante</label>
+      <label for="studentInput">Estudiantes</label>
       <div class="dropdown">
         <input id="studentInput" oninput="filterList('student')" onfocus="showList('student')">
         <div id="studentList" class="list"></div>
       </div>
 
-      <label for="font">Fuente</label>
-      <select id="font">
+      <div id="selectedStudents" style="margin-top:10px; font-size: 14px;"></div>
+
+      <label for="fontInput">Fuente</label>
+      <select id="fontInput">
         <option value="Arial">Arial</option>
         <option value="Times New Roman">Times New Roman</option>
       </select>
@@ -114,6 +116,7 @@
 
     <script>
       const dataStore = {};
+      const selectedStudents = [];
 
       window.onload = function () {
         google.script.run.withSuccessHandler(function(data) {
@@ -131,7 +134,12 @@
           const item = document.createElement('div');
           item.textContent = name;
           item.onclick = () => {
-            document.getElementById(type + 'Input').value = name;
+            if (type === 'student') {
+              addStudent(name);
+              document.getElementById(type + 'Input').value = '';
+            } else {
+              document.getElementById(type + 'Input').value = name;
+            }
             list.style.display = 'none';
           };
           list.appendChild(item);
@@ -148,7 +156,12 @@
             const item = document.createElement('div');
             item.textContent = name;
             item.onclick = () => {
-              document.getElementById(type + 'Input').value = name;
+              if (type === 'student') {
+                addStudent(name);
+                document.getElementById(type + 'Input').value = '';
+              } else {
+                document.getElementById(type + 'Input').value = name;
+              }
               list.style.display = 'none';
             };
             list.appendChild(item);
@@ -161,12 +174,35 @@
         document.getElementById(type + 'List').style.display = 'block';
       }
 
+      function addStudent(name) {
+        if (!selectedStudents.includes(name)) {
+          selectedStudents.push(name);
+          renderSelectedStudents();
+        }
+      }
+
+      function renderSelectedStudents() {
+        const container = document.getElementById('selectedStudents');
+        container.innerHTML = '';
+        selectedStudents.forEach((student, index) => {
+          const span = document.createElement('span');
+          span.textContent = student;
+          span.title = 'Haz clic para eliminar';
+          span.onclick = () => {
+            selectedStudents.splice(index, 1);
+            renderSelectedStudents();
+          };
+          container.appendChild(span);
+        });
+      }
+
       function insert() {
         const course  = document.getElementById('courseInput').value;
         const teacher = document.getElementById('teacherInput').value;
-        const student = document.getElementById('studentInput').value;
-        const font    = document.getElementById('font').value;
-        google.script.run.createCover(course, teacher, student, font);
+        const font    = document.getElementById('fontInput').value;
+        const students = selectedStudents;
+
+        google.script.run.createCover(course, teacher, students, font);
         google.script.host.close();
       }
 
