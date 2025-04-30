@@ -93,7 +93,7 @@ function createCover(course, teacher, students, font) {
   const logo = UrlFetchApp
     .fetch('https://upload.wikimedia.org/wikipedia/commons/f/f9/Escudo_UNSA.png')
     .getBlob();
-  body.appendParagraph('')
+  const logoParagraph = body.appendParagraph('')
       .setAlignment(align)
       .appendInlineImage(logo)
       .setWidth(4.24 * 72)
@@ -124,7 +124,9 @@ function createCover(course, teacher, students, font) {
   }
   else if (students.length <= 3) {
     append('Integrantes:', 16, true);
+    blank(16);
     students.forEach(name => append(name, 16, false));
+    logoParagraph.setWidth(3.45 * 72).setHeight(4.13 * 72);
   }
   else {
     append('Integrantes:', 16, true);
@@ -140,6 +142,7 @@ function createCover(course, teacher, students, font) {
 
     // Formatea toda la tabla a tamaño 16 y alineado
     formatTable(table, 16);
+    body.removeChild(body.getChild(0));
   }
 
   // Pie de página
