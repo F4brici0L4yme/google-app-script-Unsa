@@ -11,8 +11,8 @@ function onOpen() {
 function showModal() {
   const html = HtmlService
     .createHtmlOutputFromFile('dialogFinal')
-    .setWidth(450)
-    .setHeight(450);
+    .setWidth(500)
+    .setHeight(500);
   DocumentApp.getUi().showModalDialog(html, 'Personalización de carátula');
 }
 
