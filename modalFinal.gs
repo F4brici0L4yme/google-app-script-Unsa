@@ -4,16 +4,23 @@ const SHEET_NAME = 'Data';
 function onOpen() {
   DocumentApp.getUi()
     .createMenu('Carátula')
-    .addItem('Generar', 'showModal')
+    .addItem('Trabajo individual', 'showSoloModal')
+    .addItem('Trabajo grupal', 'showGroupModal')
     .addToUi();
 }
 
-function showModal() {
-  const html = HtmlService
-    .createHtmlOutputFromFile('dialogFinal')
+function showSoloModal() {
+  const html = HtmlService.createHtmlOutputFromFile('dialogSolo')
     .setWidth(500)
     .setHeight(500);
-  DocumentApp.getUi().showModalDialog(html, 'Personalización de carátula');
+  DocumentApp.getUi().showModalDialog(html, 'Carátula - Trabajo individual');
+}
+
+function showGroupModal() {
+  const html = HtmlService.createHtmlOutputFromFile('dialogGroup')
+    .setWidth(500)
+    .setHeight(600);
+  DocumentApp.getUi().showModalDialog(html, 'Carátula - Trabajo grupal');
 }
 
 function getData() {
